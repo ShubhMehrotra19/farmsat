@@ -194,7 +194,7 @@ function DashboardContent() {
                 <Activity className="w-5 h-5 text-sidebar-primary-foreground" />
               </div>
               <div>
-                <h1 className="font-bold text-sidebar-foreground">KisanMitr</h1>
+                <h1 className="font-bold text-sidebar-foreground notranslate">KisanMitr</h1>
                 <p className="text-xs text-muted-foreground">Satellite Data</p>
               </div>
             </div>
@@ -208,8 +208,8 @@ function DashboardContent() {
                   <Button
                     variant={item.active ? "default" : "ghost"}
                     className={`w-full justify-start gap-3 h-12 text-base ${item.active
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/10"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/10"
                       }`}
                     onClick={() => setActiveSection(item.id as 'home' | 'profile')}
                   >
