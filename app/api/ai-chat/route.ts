@@ -5,15 +5,16 @@ import { getFarmerDataAggregator } from '@/lib/farmer-data-aggregator'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { message, userId, context } = body
+    const { message, userId, context, history } = body
 
-    console.log('[AI Chat API] Request summary:', { 
-      messageLength: message.length, 
-      hasUserId: !!userId, 
+    console.log('[AI Chat API] Request summary:', {
+      messageLength: message.length,
+      hasUserId: !!userId,
       userId: userId ? `${userId.substring(0, 8)}...` : null,
       contextKeys: context ? Object.keys(context) : null,
       selectedPolygonId: context?.selectedField?.id ? `${context.selectedField.id.substring(0, 8)}...` : null,
-      selectedFieldName: context?.selectedField?.name
+      selectedFieldName: context?.selectedField?.name,
+      historyLength: history?.length || 0
     })
 
     // Validate required fields
@@ -51,10 +52,10 @@ export async function POST(request: NextRequest) {
 
     // Generate AI response using Gemini with real data
     const geminiAI = getGeminiAI()
-    
+
     try {
       let insights
-      
+
       if (farmerData) {
         // Use comprehensive real data for AI insights
         console.log('[AI Chat API] Using comprehensive farmer data for AI analysis')
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
             forecastEntries: farmerData.forecast?.length || 0
           }
         })
-        insights = await geminiAI.generateInsight(farmerData, message.trim())
+        insights = await geminiAI.generateInsight(farmerData, message.trim(), history || [])
       } else {
         // Fallback to basic context if no comprehensive data available
         console.log('[AI Chat API] Using basic context data for AI analysis')
@@ -86,9 +87,9 @@ export async function POST(request: NextRequest) {
           farmSize: context?.userData?.farmSize || context?.selectedField?.area || 1,
           location: context?.userLocation?.formatted_address || 'General location'
         }
-        insights = await geminiAI.generateInsight(basicFarmerData, message.trim())
+        insights = await geminiAI.generateInsight(basicFarmerData, message.trim(), history || [])
       }
-      
+
       return NextResponse.json({
         response: insights.answer,
         recommendations: insights.recommendations || [],
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
       })
     } catch (geminiError) {
       console.error('[AI Chat API] Gemini AI error:', geminiError)
-      
+
       // Enhanced fallback with real data if available
       let fallbackResponse
       if (farmerData) {
@@ -128,7 +129,7 @@ export async function POST(request: NextRequest) {
       } else {
         fallbackResponse = generateFallbackResponse(message.trim())
       }
-      
+
       return NextResponse.json({
         response: fallbackResponse.answer,
         recommendations: fallbackResponse.recommendations,
@@ -176,7 +177,7 @@ export async function POST(request: NextRequest) {
     console.error('[AI Chat API] Error processing request:', error)
 
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to process your message. Please try again.',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       },
@@ -188,21 +189,21 @@ export async function POST(request: NextRequest) {
 function generateDataDrivenFallback(message: string, farmerData: any): { answer: string; recommendations: string[]; urgentAlerts?: string[] } {
   const lowerMessage = message.toLowerCase()
   const urgentAlerts: string[] = []
-  
+
   // Extract current conditions from real data
   const weather = farmerData.currentWeather
   const ndvi = farmerData.ndviData?.[0] // Most recent NDVI
   const soil = farmerData.soilData?.[0] // Most recent soil data
   const uvIndex = farmerData.uvIndex
-  
+
   // Weather-based responses with real data
   if (lowerMessage.includes('weather') || lowerMessage.includes('rain') || lowerMessage.includes('temperature')) {
     let answer = `Based on your current weather conditions: `
     const recommendations: string[] = []
-    
+
     if (weather) {
       answer += `Temperature is ${weather.temp}°C with ${weather.humidity}% humidity. `
-      
+
       if (weather.temp > 35) {
         urgentAlerts.push(`High temperature alert: ${weather.temp}°C - Protect crops and increase irrigation`)
         recommendations.push('Increase watering frequency due to high temperatures')
@@ -210,30 +211,30 @@ function generateDataDrivenFallback(message: string, farmerData: any): { answer:
         urgentAlerts.push(`Low temperature alert: ${weather.temp}°C - Protect crops from cold`)
         recommendations.push('Protect crops from cold temperatures')
       }
-      
+
       if (weather.humidity > 80) {
         recommendations.push('High humidity detected - monitor for fungal diseases')
       } else if (weather.humidity < 30) {
         recommendations.push('Low humidity - increase irrigation and consider mulching')
       }
-      
+
       recommendations.push(`Current conditions: ${weather.description}`)
     } else {
       answer += `Monitor daily weather forecasts and plan activities accordingly.`
       recommendations.push('Check local weather forecasts daily')
     }
-    
+
     return { answer, recommendations, urgentAlerts }
   }
-  
+
   // Irrigation responses with soil moisture data
   if (lowerMessage.includes('irrigat') || lowerMessage.includes('water') || lowerMessage.includes('moisture')) {
     let answer = `Based on your soil conditions: `
     const recommendations: string[] = []
-    
+
     if (soil) {
       answer += `Soil moisture is at ${soil.moisture}% with soil temperature ${soil.soilTemp}°C. `
-      
+
       if (soil.moisture < 30) {
         urgentAlerts.push(`Low soil moisture: ${soil.moisture}% - Irrigation needed`)
         recommendations.push('Irrigate immediately - soil moisture is critically low')
@@ -243,65 +244,65 @@ function generateDataDrivenFallback(message: string, farmerData: any): { answer:
       } else {
         recommendations.push(`Soil moisture is adequate at ${soil.moisture}%`)
       }
-      
+
       recommendations.push(`Soil temperature: ${soil.soilTemp}°C - ${soil.soilTemp > 25 ? 'Consider evening watering' : 'Morning watering is fine'}`)
     } else {
       answer += `Regular soil moisture monitoring is essential.`
       recommendations.push('Check soil moisture by digging 2-3 inches down')
     }
-    
+
     return { answer, recommendations, urgentAlerts }
   }
-  
+
   // Crop health with NDVI data
   if (lowerMessage.includes('crop') || lowerMessage.includes('plant') || lowerMessage.includes('health') || lowerMessage.includes('ndvi')) {
     let answer = `Based on your crop monitoring: `
     const recommendations: string[] = []
-    
+
     if (ndvi) {
       answer += `Your crop NDVI is ${ndvi.ndviMean.toFixed(3)} indicating ${ndvi.ndviStatus} condition. `
-      
+
       if (ndvi.ndviMean < 0.3) {
         urgentAlerts.push(`Low NDVI detected: ${ndvi.ndviMean.toFixed(3)} - Crop stress indicated`)
         recommendations.push('Investigate crop stress - check for pests, diseases, or nutrient deficiency')
       } else if (ndvi.ndviMean > 0.7) {
         recommendations.push(`Excellent crop health with NDVI ${ndvi.ndviMean.toFixed(3)}`)
       }
-      
+
       recommendations.push(`${ndvi.description}`)
     } else {
       answer += `Regular crop monitoring and satellite data can help track health.`
     }
-    
+
     recommendations.push('Monitor crops weekly for early detection of issues')
     return { answer, recommendations, urgentAlerts }
   }
-  
+
   // UV Index based responses
   if (lowerMessage.includes('uv') || lowerMessage.includes('sun') || lowerMessage.includes('radiation')) {
     let answer = `Current UV conditions: `
     const recommendations: string[] = []
-    
+
     if (uvIndex !== undefined) {
       answer += `UV Index is ${uvIndex}. `
-      
+
       if (uvIndex > 8) {
         urgentAlerts.push(`Very high UV index: ${uvIndex} - Protect crops and workers`)
         recommendations.push('Provide shade for sensitive crops during peak hours')
       } else if (uvIndex > 6) {
         recommendations.push('Moderate to high UV - consider protective measures')
       }
-      
+
       recommendations.push(`Work during early morning or evening when UV is lower`)
     }
-    
+
     return { answer, recommendations, urgentAlerts }
   }
-  
+
   // Default response with available data summary
   let answer = `Based on your current farm data: `
   const recommendations: string[] = []
-  
+
   if (weather) {
     answer += `Weather: ${weather.temp}°C, ${weather.humidity}% humidity. `
   }
@@ -311,17 +312,17 @@ function generateDataDrivenFallback(message: string, farmerData: any): { answer:
   if (ndvi) {
     answer += `Crop health: NDVI ${ndvi.ndviMean.toFixed(3)} (${ndvi.ndviStatus}). `
   }
-  
+
   recommendations.push('Continue monitoring weather and soil conditions')
   recommendations.push('Maintain regular irrigation schedule based on soil moisture')
   recommendations.push('Keep detailed records of farming activities')
-  
+
   return { answer, recommendations, urgentAlerts }
 }
 
 function generateFallbackResponse(message: string): { answer: string; recommendations: string[]; urgentAlerts?: string[] } {
   const lowerMessage = message.toLowerCase()
-  
+
   // Weather-related questions
   if (lowerMessage.includes('weather') || lowerMessage.includes('rain') || lowerMessage.includes('temperature')) {
     return {
@@ -335,7 +336,7 @@ function generateFallbackResponse(message: string): { answer: string; recommenda
       urgentAlerts: []
     }
   }
-  
+
   // Irrigation questions
   if (lowerMessage.includes('irrigat') || lowerMessage.includes('water') || lowerMessage.includes('moisture')) {
     return {
@@ -349,7 +350,7 @@ function generateFallbackResponse(message: string): { answer: string; recommenda
       urgentAlerts: []
     }
   }
-  
+
   // Crop health questions
   if (lowerMessage.includes('crop') || lowerMessage.includes('plant') || lowerMessage.includes('health') || lowerMessage.includes('disease')) {
     return {
@@ -363,7 +364,7 @@ function generateFallbackResponse(message: string): { answer: string; recommenda
       urgentAlerts: []
     }
   }
-  
+
   // Soil questions
   if (lowerMessage.includes('soil') || lowerMessage.includes('fertilizer') || lowerMessage.includes('nutrient')) {
     return {
@@ -377,7 +378,7 @@ function generateFallbackResponse(message: string): { answer: string; recommenda
       urgentAlerts: []
     }
   }
-  
+
   // General farming advice
   return {
     answer: 'Successful farming requires careful planning, regular monitoring, and adapting to changing conditions. Focus on soil health, proper irrigation, and crop care.',

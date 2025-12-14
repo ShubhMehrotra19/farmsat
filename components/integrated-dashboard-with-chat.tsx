@@ -90,12 +90,12 @@ interface IntegratedDashboardProps {
   userLocation: GeocodingResult | null
 }
 
-export function IntegratedDashboardWithChat({ 
-  selectedPolygon, 
-  onPolygonCreated, 
-  onPolygonSelected, 
-  existingPolygons, 
-  userLocation 
+export function IntegratedDashboardWithChat({
+  selectedPolygon,
+  onPolygonCreated,
+  onPolygonSelected,
+  existingPolygons,
+  userLocation
 }: IntegratedDashboardProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputMessage, setInputMessage] = useState('')
@@ -109,7 +109,7 @@ export function IntegratedDashboardWithChat({
   useEffect(() => {
     setIsClient(true)
   }, [])
-  
+
   // Load user data from localStorage
   useEffect(() => {
     const storedUserData = localStorage.getItem('userData')
@@ -117,7 +117,7 @@ export function IntegratedDashboardWithChat({
       setUserData(JSON.parse(storedUserData))
     }
   }, [])
-  
+
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -133,7 +133,7 @@ export function IntegratedDashboardWithChat({
     if (showChat && messages.length === 0) {
       const userData = JSON.parse(localStorage.getItem('userData') || '{}')
       const hasUserId = !!userData.userId
-      
+
       const welcomeMessage: Message = {
         id: 'welcome',
         type: 'assistant',
@@ -196,7 +196,7 @@ What would you like to know about your farming operations?`,
       // Get user data from localStorage
       const userData = JSON.parse(localStorage.getItem('userData') || '{}')
       const farmFields = JSON.parse(localStorage.getItem('farmFields') || '[]')
-      
+
       // Validate user data for debugging
       if (!userData.userId) {
         console.warn('[Chat] No userId found in localStorage. User may need to complete onboarding.')
@@ -225,7 +225,14 @@ What would you like to know about your farming operations?`,
       const requestBody = {
         message: content.trim(),
         userId: userData.userId || null, // Ensure we send null if no userId
-        context
+        context,
+        history: messages
+          .filter(m => !m.isLoading && m.id !== 'welcome' && (m.type === 'user' || m.type === 'assistant'))
+          .map(m => ({
+            role: m.type,
+            content: m.content
+          }))
+          .slice(-10) // Limit to last 10 messages for context window
       }
 
       // Log request summary (not full body for security)
@@ -263,9 +270,9 @@ What would you like to know about your farming operations?`,
       setMessages(prev => prev.slice(0, -1).concat([assistantMessage]))
     } catch (error: any) {
       console.error('Error sending message:', error)
-      
+
       let errorContent = 'I apologize, but I encountered an error while processing your request. '
-      
+
       if (error.message?.includes('400')) {
         errorContent += 'Please try rephrasing your question or ask about general farming topics.'
       } else if (error.message?.includes('500')) {
@@ -273,7 +280,7 @@ What would you like to know about your farming operations?`,
       } else {
         errorContent += 'Please try again or ask a different question.'
       }
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
         type: 'assistant',
@@ -350,8 +357,8 @@ What would you like to know about your farming operations?`,
 
         {/* Data Dashboard Tab */}
         <TabsContent value="dashboard" className="flex-1 mt-4">
-          <ComprehensiveDashboard 
-            selectedPolygon={selectedPolygon} 
+          <ComprehensiveDashboard
+            selectedPolygon={selectedPolygon}
             cropName={userData?.farmerProfile?.cropName || userData?.primaryCrop}
             userId={userData?.userId}
           />
@@ -377,7 +384,7 @@ What would you like to know about your farming operations?`,
                     )}
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="flex-1 flex flex-col p-0">
                   {/* Messages */}
                   <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
@@ -385,9 +392,8 @@ What would you like to know about your farming operations?`,
                       {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex items-start gap-3 ${
-                            message.type === 'user' ? 'justify-end' : 'justify-start'
-                          }`}
+                          className={`flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'
+                            }`}
                         >
                           {message.type === 'assistant' && (
                             <Avatar className="w-8 h-8 bg-primary">
@@ -396,13 +402,12 @@ What would you like to know about your farming operations?`,
                               </AvatarFallback>
                             </Avatar>
                           )}
-                          
+
                           <div
-                            className={`max-w-[80%] p-3 rounded-lg ${
-                              message.type === 'user'
+                            className={`max-w-[80%] p-3 rounded-lg ${message.type === 'user'
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted'
-                            }`}
+                              }`}
                           >
                             {message.isLoading ? (
                               <div className="flex items-center gap-2">
@@ -412,7 +417,7 @@ What would you like to know about your farming operations?`,
                             ) : (
                               <>
                                 <p className="whitespace-pre-wrap">{message.content}</p>
-                                
+
                                 {message.insights && (
                                   <div className="mt-3 space-y-2">
                                     {message.insights.recommendations.length > 0 && (
@@ -428,7 +433,7 @@ What would you like to know about your farming operations?`,
                                         </ul>
                                       </div>
                                     )}
-                                    
+
                                     {message.insights.urgentAlerts && message.insights.urgentAlerts.length > 0 && (
                                       <Alert>
                                         <AlertTriangle className="h-4 w-4" />
@@ -441,14 +446,14 @@ What would you like to know about your farming operations?`,
                                         </AlertDescription>
                                       </Alert>
                                     )}
-                                    
+
                                     <div className="space-y-1">
                                       {message.insights.sources.length > 0 && (
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                           <span>Sources: {message.insights.sources.join(', ')}</span>
                                         </div>
                                       )}
-                                      
+
                                       {message.insights.dataUsed && (
                                         <div className="flex flex-wrap gap-1 text-xs">
                                           <span className="text-muted-foreground">Real data used:</span>
@@ -485,12 +490,12 @@ What would you like to know about your farming operations?`,
                                 )}
                               </>
                             )}
-                            
+
                             <div className="text-xs text-muted-foreground mt-2" suppressHydrationWarning>
                               {isClient ? message.timestamp.toLocaleTimeString() : '--:--:--'}
                             </div>
                           </div>
-                          
+
                           {message.type === 'user' && (
                             <Avatar className="w-8 h-8 bg-secondary">
                               <AvatarFallback>
@@ -502,7 +507,7 @@ What would you like to know about your farming operations?`,
                       ))}
                     </div>
                   </ScrollArea>
-                  
+
                   {/* Input */}
                   <div className="flex-none p-6 border-t">
                     {error && (
@@ -511,7 +516,7 @@ What would you like to know about your farming operations?`,
                         <AlertDescription>{error}</AlertDescription>
                       </Alert>
                     )}
-                    
+
                     <div className="flex gap-2">
                       <Input
                         ref={inputRef}
@@ -522,7 +527,7 @@ What would you like to know about your farming operations?`,
                         disabled={isLoading}
                         className="flex-1"
                       />
-                      <Button 
+                      <Button
                         onClick={() => handleSendMessage(inputMessage)}
                         disabled={isLoading || !inputMessage.trim()}
                       >
@@ -534,7 +539,7 @@ What would you like to know about your farming operations?`,
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Quick Questions & Field Info */}
             <div className="space-y-6">
               {/* Field Info */}
@@ -561,7 +566,7 @@ What would you like to know about your farming operations?`,
                   </CardContent>
                 </Card>
               )}
-              
+
               {/* Quick Questions */}
               <Card>
                 <CardHeader>

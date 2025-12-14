@@ -29,7 +29,7 @@ export function Hero({ onGetStarted }: { onGetStarted: () => void }) {
                         </div>
 
                         <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-emerald-950 mb-6 leading-[1.1]">
-                            Kisan<span className="text-emerald-600">Mitr</span>
+                            Kisan<span className="text-emerald-600 notranslate">Mitr</span>
                         </h1>
 
                         <p className="text-xl lg:text-2xl text-gray-600 font-light mb-8 max-w-xl leading-relaxed">
@@ -42,7 +42,7 @@ export function Hero({ onGetStarted }: { onGetStarted: () => void }) {
                                 onClick={onGetStarted}
                                 className="bg-emerald-700 hover:bg-emerald-800 text-white text-lg px-8 py-7 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center gap-3"
                             >
-                                Join KisanMitr
+                                Join <span className="notranslate">KisanMitr</span>
                                 <ArrowRight className="w-5 h-5" />
                             </Button>
                         </div>
