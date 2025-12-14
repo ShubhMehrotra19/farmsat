@@ -3,79 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  /* Agriculture-inspired light palette */
-  --background: #f7fee7; /* light farm field */
-  --foreground: #374151;
-  --card: #ffffff;
-  --card-foreground: #1f2937;
-  --popover: #ffffff;
-  --popover-foreground: #1f2937;
-  --primary: #047857; /* emerald-700 */
-  --primary-foreground: #ffffff;
-  --secondary: #a3e635; /* lime-400 */
-  --secondary-foreground: #052e16;
-  --muted: #ecfccb; /* lime-100 */
-  --muted-foreground: #3f6212;
-  --accent: #f59e0b; /* amber-500 */
-  --accent-foreground: #1f2937;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
-  --input: #f1f5f9;
-  --ring: rgba(4, 120, 87, 0.5);
-  --chart-1: #3b82f6;
-  --chart-2: #f59e0b;
-  --chart-3: #10b981;
-  --chart-4: #ef4444;
-  --chart-5: #6366f1;
-  --radius: 0.5rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1f2937;
-  --sidebar-primary: #047857;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #065f46;
-  --sidebar-accent-foreground: #ecfccb;
-  --sidebar-border: #e5e7eb;
-  --sidebar-ring: rgba(4, 120, 87, 0.5);
-}
-
-.dark {
-  /* Agriculture-inspired dark palette */
-  --background: #052e16; /* forest dark */
-  --foreground: #ecfdf5;
-  --card: #0b3a1f;
-  --card-foreground: #ecfdf5;
-  --popover: #0b3a1f;
-  --popover-foreground: #ecfdf5;
-  --primary: #10b981; /* emerald-500 */
-  --primary-foreground: #052e16;
-  --secondary: #84cc16; /* lime-500 */
-  --secondary-foreground: #052e16;
-  --muted: #064e3b;
-  --muted-foreground: #a7f3d0;
-  --accent: #f59e0b;
-  --accent-foreground: #052e16;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #064e3b;
-  --input: #083a2a;
-  --ring: rgba(16, 185, 129, 0.5);
-  --chart-1: #3b82f6;
-  --chart-2: #f59e0b;
-  --chart-3: #10b981;
-  --chart-4: #ef4444;
-  --chart-5: #6366f1;
-  --sidebar: #0b3a1f;
-  --sidebar-foreground: #ecfdf5;
-  --sidebar-primary: #10b981;
-  --sidebar-primary-foreground: #052e16;
-  --sidebar-accent: #34d399;
-  --sidebar-accent-foreground: #052e16;
-  --sidebar-border: #064e3b;
-  --sidebar-ring: rgba(16, 185, 129, 0.5);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -115,11 +42,78 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+:root {
+  /* Vibrant Agriculture Palette */
+  --background: #ffffff;
+  --foreground: #1a2e05; /* Deep moss green */
+  
+  --card: #ffffff;
+  --card-foreground: #1a2e05;
+  
+  --popover: #ffffff;
+  --popover-foreground: #1a2e05;
+  
+  /* Vibrant Emerald */
+  --primary: #059669; /* emerald-600 */
+  --primary-foreground: #ffffff;
+  
+  /* Fresh Lime */
+  --secondary: #d9f99d; /* lime-200 */
+  --secondary-foreground: #365314; /* lime-950 */
+  
+  /* Soft Earth/Mist */
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+  
+  /* Harvest Sun */
+  --accent: #f59e0b; /* amber-500 */
+  --accent-foreground: #ffffff;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e5e7eb;
+  --input: #f9fafb;
+  --ring: #059669;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  
+  --primary: #34d399; /* emerald-400 */
+  --primary-foreground: #022c22;
+  
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  
+  --accent: #fbbf24;
+  --accent-foreground: #1e293b;
+  
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f8fafc;
+  
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #34d399;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }

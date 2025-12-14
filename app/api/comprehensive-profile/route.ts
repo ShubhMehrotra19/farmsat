@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (farmFields.length > 0) {
       // Calculate total area from fields
       const totalArea = farmFields.reduce((sum: number, field: any) => sum + field.area, 0)
-      
+
       // Create farm
       farm = await prisma.farm.create({
         data: {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       try {
         const { getAgromonitoringAPI } = await import('@/lib/agromonitoring-api')
         const agroAPI = getAgromonitoringAPI()
-        
+
         for (const field of farmFields) {
           // Create field in database
           const dbField = await prisma.field.create({
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
                 lat: coord[1],
                 lng: coord[0]
               }))
-              
+
               const polygon = await agroAPI.createPolygon(field.name, points)
               console.log(`[Comprehensive Profile] Created agromonitoring polygon: ${polygon.id} for field: ${field.name}`)
             }
@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to save comprehensive farmer profile',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       },
@@ -286,7 +286,7 @@ export async function GET(request: NextRequest) {
         if (coordMatch) {
           const lat = parseFloat(coordMatch[1])
           const lng = parseFloat(coordMatch[2])
-          
+
           weatherData = await fetch(`https://api.agromonitoring.com/agro/1.0/weather?lat=${lat}&lon=${lng}&appid=${process.env.NEXT_PUBLIC_AGROMONITORING_API_KEY}`)
             .then(res => res.json())
             .catch(err => {
@@ -315,7 +315,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('[Comprehensive Profile API] Error fetching comprehensive profile:', error)
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch comprehensive farmer profile',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       },
