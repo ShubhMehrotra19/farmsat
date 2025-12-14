@@ -16,7 +16,7 @@ import { LanguageProvider, useLanguage, type Language } from "@/lib/profile-tran
 // Language selector component
 function LanguageSelector() {
   const { language, setLanguage, t } = useLanguage()
-  
+
   return (
     <div className="flex items-center gap-2 mb-4">
       <Languages className="w-4 h-4 text-muted-foreground" />
@@ -78,7 +78,7 @@ function DashboardContent() {
       if (storedUserData) {
         const parsedUserData = JSON.parse(storedUserData)
         setUserData(parsedUserData)
-        
+
         // Use pincode location first, then browser location as fallback
         if (parsedUserData.pincodeLocation) {
           setUserLocation(parsedUserData.pincodeLocation)
@@ -125,7 +125,7 @@ function DashboardContent() {
     try {
       localStorage.removeItem('userData')
       localStorage.removeItem('farmFields')
-    } catch {}
+    } catch { }
     setUserData(null)
     setSelectedPolygon(null)
     router.replace('/')
@@ -158,9 +158,9 @@ function DashboardContent() {
             <div className="text-sm text-gray-600">
               <p>
                 Get your API key from{" "}
-                <a 
-                  href="https://agromonitoring.com/api" 
-                  target="_blank" 
+                <a
+                  href="https://agromonitoring.com/api"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
@@ -168,8 +168,8 @@ function DashboardContent() {
                 </a>
               </p>
             </div>
-            <Button 
-              onClick={() => window.location.reload()} 
+            <Button
+              onClick={() => window.location.reload()}
               className="w-full"
             >
               Refresh Page
@@ -194,7 +194,7 @@ function DashboardContent() {
                 <Activity className="w-5 h-5 text-sidebar-primary-foreground" />
               </div>
               <div>
-                <h1 className="font-bold text-sidebar-foreground">FarmSat</h1>
+                <h1 className="font-bold text-sidebar-foreground">KisanMitr</h1>
                 <p className="text-xs text-muted-foreground">Satellite Data</p>
               </div>
             </div>
@@ -207,11 +207,10 @@ function DashboardContent() {
                 <li key={item.id}>
                   <Button
                     variant={item.active ? "default" : "ghost"}
-                    className={`w-full justify-start gap-3 h-12 text-base ${
-                      item.active
+                    className={`w-full justify-start gap-3 h-12 text-base ${item.active
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : "text-sidebar-foreground hover:bg-sidebar-accent/10"
-                    }`}
+                      }`}
                     onClick={() => setActiveSection(item.id as 'home' | 'profile')}
                   >
                     {item.icon && <item.icon className="w-5 h-5" />}
@@ -310,7 +309,7 @@ function DashboardContent() {
         {/* Dashboard Content */}
         <main className="flex-1 p-4 lg:p-6">
           {activeSection === 'home' && (
-            <IntegratedDashboardWithChat 
+            <IntegratedDashboardWithChat
               selectedPolygon={selectedPolygon}
               onPolygonCreated={handlePolygonCreated}
               onPolygonSelected={handlePolygonSelected}
@@ -323,7 +322,7 @@ function DashboardContent() {
             <div className="space-y-6">
               {/* Language Selector */}
               <LanguageSelector />
-              
+
               {/* Personal Information Card */}
               <Card>
                 <CardHeader>
@@ -398,8 +397,8 @@ function DashboardContent() {
                     <div>
                       <div className="text-sm text-muted-foreground">{t.profile.farmingDetails.storage}</div>
                       <div className="font-medium">
-                        {userData?.farmerProfile?.hasStorageCapacity ? 
-                          `${userData.farmerProfile.storageCapacity || 0} ${t.profile.farmingDetails.storageUnit}` : 
+                        {userData?.farmerProfile?.hasStorageCapacity ?
+                          `${userData.farmerProfile.storageCapacity || 0} ${t.profile.farmingDetails.storageUnit}` :
                           (userData?.farmerProfile ? t.profile.farmingDetails.storageValues.no : t.profile.farmingDetails.storageValues.na)
                         }
                       </div>

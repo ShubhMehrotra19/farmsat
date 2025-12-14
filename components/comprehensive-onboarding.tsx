@@ -31,7 +31,7 @@ const comprehensiveOnboardingSchema = z.object({
     lat: z.number(),
     lng: z.number()
   }).optional(),
-  
+
   // Farm Area Information
   farmFields: z.array(z.object({
     id: z.string(),
@@ -40,22 +40,22 @@ const comprehensiveOnboardingSchema = z.object({
     area: z.number(),
     cropType: z.string().optional()
   })).min(1, 'Please draw at least one farm field'),
-  
+
   // Farming Information
   primaryCrop: z.string().min(1, 'Please select your primary crop'),
   soilType: z.string().min(1, 'Please select your soil type'),
   sowingDate: z.date({ required_error: 'Please select the sowing date' }),
-  
+
   // Farm Infrastructure
   hasStorageCapacity: z.boolean(),
   storageCapacity: z.string().optional(),
   irrigationMethod: z.string().min(1, 'Please select your irrigation method'),
-  
+
   // Experience & Scale
   farmingExperience: z.string().optional(),
   totalFarmSize: z.string().optional(),
   previousYield: z.string().optional(),
-  
+
   // Preferences
   preferredLanguage: z.string().default('en')
 })
@@ -161,10 +161,10 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
 
   const geocodePincode = async (pincode: string) => {
     if (!pincode || pincode.length !== 6) return
-    
+
     setIsGeocodingPincode(true)
     setGeocodingError(null)
-    
+
     try {
       const result = await geocodingService.geocodePincode(pincode)
       setPincodeLocation(result)
@@ -193,7 +193,7 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
   const nextStep = async () => {
     const currentStepFields = getStepFields(currentStep)
     const isStepValid = await trigger(currentStepFields as any)
-    
+
     if (isStepValid && currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1)
     }
@@ -221,7 +221,7 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
     try {
       // Calculate total farm size from drawn fields
       const totalArea = data.farmFields.reduce((sum, field) => sum + field.area, 0)
-      
+
       // Prepare data for submission
       const submissionData = {
         ...data,
@@ -253,7 +253,7 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
             <Globe className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-bold">Welcome to FarmSat</h1>
+          <h1 className="text-3xl font-bold">Welcome to KisanMitr</h1>
           <p className="text-muted-foreground">
             AI-powered farming assistant with satellite data - Let's set up your complete profile
           </p>
@@ -284,8 +284,8 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
                   index < currentStep
                     ? "bg-primary border-primary text-primary-foreground"
                     : index === currentStep
-                    ? "border-primary text-primary"
-                    : "border-muted-foreground"
+                      ? "border-primary text-primary"
+                      : "border-muted-foreground"
                 )}
               >
                 {index < currentStep ? <Check className="w-4 h-4" /> : index + 1}
@@ -351,10 +351,10 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
                             {isGeocodingPincode && <span className="text-xs text-muted-foreground">(Looking up location...)</span>}
                           </FormLabel>
                           <FormControl>
-                            <Input 
-                              placeholder="Enter your area pincode" 
-                              maxLength={6} 
-                              {...field} 
+                            <Input
+                              placeholder="Enter your area pincode"
+                              maxLength={6}
+                              {...field}
                             />
                           </FormControl>
                           {pincodeLocation && (
@@ -438,7 +438,7 @@ export function ComprehensiveOnboarding({ onComplete, onSkip }: ComprehensiveOnb
                       <SimpleFieldCreator
                         onFieldsCreated={onFieldsCreated}
                         initialCenter={
-                          form.watch('location') || 
+                          form.watch('location') ||
                           (pincodeLocation ? { lat: pincodeLocation.lat, lng: pincodeLocation.lng } : undefined)
                         }
                       />

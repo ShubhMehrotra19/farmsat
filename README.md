@@ -1,4 +1,4 @@
-# 🌾 FarmSat - Satellite Data for Modern Farming
+# 🌾 KisanMitr - AI & Satellite Data for Modern Farming
 
 A comprehensive farmer dashboard application that provides real-time satellite data, weather monitoring, soil analysis, and vegetation health tracking for precision agriculture.
 
