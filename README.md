@@ -1,6 +1,6 @@
 # 🌾 KisanMitr - AI & Satellite Data for Modern Farming
 
-A comprehensive farmer dashboard application that provides real-time satellite data, weather monitoring, soil analysis, and vegetation health tracking for precision agriculture.
+A comprehensive farmer dashboard that provides real-time satellite data, weather monitoring, soil analysis, and vegetation health tracking for precision agriculture.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.2.4-black)
 ![React](https://img.shields.io/badge/React-19-blue)
