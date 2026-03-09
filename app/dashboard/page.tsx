@@ -4,10 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Home, User, Menu, Calendar, Activity, Languages } from "lucide-react"
+import { Home, User, Menu, Calendar, Activity, Languages, MessageSquare, Phone } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import IntegratedDashboardWithChat from "@/components/integrated-dashboard-with-chat"
+import { KisanCallCenter } from "@/components/kisan-call-center"
+import { TelegramBot } from "@/components/telegram-bot"
 import { getAgromonitoringAPI, type PolygonResponse } from "@/lib/agromonitoring-api"
 import { useUserPolygons } from "@/hooks/use-agromonitoring-comprehensive"
 import type { GeocodingResult } from "@/lib/geocoding-api"
@@ -43,11 +45,12 @@ function DashboardContent() {
   const [selectedPolygon, setSelectedPolygon] = useState<PolygonResponse | null>(null)
   const [isAPIConfigured, setIsAPIConfigured] = useState(false)
   const [userLocation, setUserLocation] = useState<GeocodingResult | null>(null)
-  const [activeSection, setActiveSection] = useState<'home' | 'profile'>('home')
+  const [activeSection, setActiveSection] = useState<'home' | 'profile' | 'telegram' | 'kisan-call'>('home')
   const [userData, setUserData] = useState<{
     fullName: string
     mobile: string
     pincode: string
+    userId?: string
     browserLocation?: { lat: number; lng: number } | null
     pincodeLocation?: GeocodingResult | null
     farmerProfile?: {
@@ -68,6 +71,8 @@ function DashboardContent() {
   const sidebarItems = [
     { icon: Home, label: "Home", id: "home", active: activeSection === 'home' },
     { icon: User, label: t.sidebarProfile.label, id: "profile", active: activeSection === 'profile' },
+    { icon: MessageSquare, label: "Telegram Updates", id: "telegram", active: activeSection === 'telegram' },
+    { icon: Phone, label: "Kisan Call Center", id: "kisan-call", active: activeSection === 'kisan-call' },
   ] as const
 
   // Load user data from localStorage and initialize API
@@ -208,10 +213,10 @@ function DashboardContent() {
                   <Button
                     variant={item.active ? "default" : "ghost"}
                     className={`w-full justify-start gap-3 h-12 text-base ${item.active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/10"
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "text-sidebar-foreground hover:bg-green-100 hover:text-green-700"
                       }`}
-                    onClick={() => setActiveSection(item.id as 'home' | 'profile')}
+                    onClick={() => setActiveSection(item.id as 'home' | 'profile' | 'telegram' | 'kisan-call')}
                   >
                     {item.icon && <item.icon className="w-5 h-5" />}
                     {item.label}
@@ -406,6 +411,18 @@ function DashboardContent() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
+
+          {activeSection === 'telegram' && (
+            <div className="max-w-2xl mx-auto">
+              <TelegramBot userId={userData?.userId || ''} userLocation={userData?.pincodeLocation?.formatted_address} />
+            </div>
+          )}
+
+          {activeSection === 'kisan-call' && (
+            <div className="max-w-2xl mx-auto">
+              <KisanCallCenter />
             </div>
           )}
         </main>
