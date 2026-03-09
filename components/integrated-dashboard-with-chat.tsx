@@ -1,16 +1,28 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, AlertTriangle, CheckCircle, Lightbulb, TrendingUp, Loader2, MessageSquare, MapPin, BarChart3 } from 'lucide-react'
+import React, { useState, useRef, useEffect } from "react"
+import {
+  Send,
+  Bot,
+  User,
+  AlertTriangle,
+  CheckCircle,
+  Lightbulb,
+  TrendingUp,
+  Loader2,
+  MessageSquare,
+  MapPin,
+  BarChart3,
+} from "lucide-react"
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import GoogleMapsFieldCreator from "@/components/google-maps-field-creator"
 import ComprehensiveDashboard from "@/components/comprehensive-dashboard"
@@ -19,7 +31,7 @@ import type { GeocodingResult } from "@/lib/geocoding-api"
 
 interface Message {
   id: string
-  type: 'user' | 'assistant'
+  type: "user" | "assistant"
   content: string
   timestamp: Date
   insights?: {
@@ -57,29 +69,29 @@ interface PresetQuestion {
 
 const PRESET_QUESTIONS: PresetQuestion[] = [
   {
-    id: 'current_conditions',
-    question: 'What are my current weather and soil conditions?',
-    category: 'Current Status',
-    icon: TrendingUp
+    id: "current_conditions",
+    question: "What are my current weather and soil conditions?",
+    category: "Current Status",
+    icon: TrendingUp,
   },
   {
-    id: 'irrigation_today',
-    question: 'Should I irrigate today based on soil moisture and weather?',
-    category: 'Irrigation',
-    icon: CheckCircle
+    id: "irrigation_today",
+    question: "Should I irrigate today based on soil moisture and weather?",
+    category: "Irrigation",
+    icon: CheckCircle,
   },
   {
-    id: 'crop_ndvi',
-    question: 'What does my NDVI data say about crop health?',
-    category: 'Crop Health',
-    icon: Lightbulb
+    id: "crop_ndvi",
+    question: "What does my NDVI data say about crop health?",
+    category: "Crop Health",
+    icon: Lightbulb,
   },
   {
-    id: 'uv_work_timing',
-    question: 'What are the best work hours based on UV index?',
-    category: 'Work Planning',
-    icon: MapPin
-  }
+    id: "uv_work_timing",
+    question: "What are the best work hours based on UV index?",
+    category: "Work Planning",
+    icon: MapPin,
+  },
 ]
 
 interface IntegratedDashboardProps {
@@ -95,14 +107,14 @@ export function IntegratedDashboardWithChat({
   onPolygonCreated,
   onPolygonSelected,
   existingPolygons,
-  userLocation
+  userLocation,
 }: IntegratedDashboardProps) {
   const [messages, setMessages] = useState<Message[]>([])
-  const [inputMessage, setInputMessage] = useState('')
+  const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showChat, setShowChat] = useState(false)
-  const [activeTab, setActiveTab] = useState('fields')
+  const [activeTab, setActiveTab] = useState("fields")
   const [userData, setUserData] = useState<any>(null)
   const [isClient, setIsClient] = useState(false)
 
@@ -112,7 +124,7 @@ export function IntegratedDashboardWithChat({
 
   // Load user data from localStorage
   useEffect(() => {
-    const storedUserData = localStorage.getItem('userData')
+    const storedUserData = localStorage.getItem("userData")
     if (storedUserData) {
       setUserData(JSON.parse(storedUserData))
     }
@@ -131,39 +143,49 @@ export function IntegratedDashboardWithChat({
   // Welcome message when chat is first opened
   useEffect(() => {
     if (showChat && messages.length === 0) {
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}")
       const hasUserId = !!userData.userId
 
       const welcomeMessage: Message = {
-        id: 'welcome',
-        type: 'assistant',
+        id: "welcome",
+        type: "assistant",
         content: `Welcome to your AI Farming Assistant powered by Gemini 2.0 Flash! 🌱 
 
 I provide real-time insights using:
-${hasUserId ? `✅ Your live weather data
+${
+  hasUserId
+    ? `✅ Your live weather data
 ✅ Real-time soil moisture & temperature  
 ✅ NDVI satellite crop health monitoring
 ✅ UV index for optimal work timing
 ✅ Your specific crop and soil information
 
-🔍 Profile: ${userData.userId ? `Linked (${userData.userId.substring(0, 8)}...)` : 'Not Found'}` : `• Weather-based farming decisions
+🔍 Profile: ${userData.userId ? `Linked (${userData.userId.substring(0, 8)}...)` : "Not Found"}`
+    : `• Weather-based farming decisions
 • Irrigation scheduling guidance
 • Crop health analysis
 • Field management optimization
-• General farming recommendations`}
+• General farming recommendations`
+}
 
-${selectedPolygon ? `📍 Active Field: "${selectedPolygon.name}" (${selectedPolygon.area} hectares)
-` : ''}${hasUserId ? `💡 Ask me about your current conditions, soil moisture, crop health, or any farming question!` : `💡 Complete your profile for personalized insights based on real satellite and weather data!`}
+${
+  selectedPolygon
+    ? `📍 Active Field: "${selectedPolygon.name}" (${selectedPolygon.area} hectares)
+`
+    : ""
+}${hasUserId ? `💡 Ask me about your current conditions, soil moisture, crop health, or any farming question!` : `💡 Complete your profile for personalized insights based on real satellite and weather data!`}
 
 What would you like to know about your farming operations?`,
         timestamp: new Date(),
-        insights: hasUserId ? {
-          answer: '',
-          recommendations: [],
-          urgentAlerts: [],
-          confidence: 1.0,
-          sources: ['Real-time Weather', 'Satellite Data', 'Soil Monitoring', 'AI Analysis']
-        } : undefined
+        insights: hasUserId
+          ? {
+              answer: "",
+              recommendations: [],
+              urgentAlerts: [],
+              confidence: 1.0,
+              sources: ["Real-time Weather", "Satellite Data", "Soil Monitoring", "AI Analysis"],
+            }
+          : undefined,
       }
       setMessages([welcomeMessage])
     }
@@ -174,52 +196,54 @@ What would you like to know about your farming operations?`,
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: "user",
       content: content.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
     }
 
     const loadingMessage: Message = {
       id: (Date.now() + 1).toString(),
-      type: 'assistant',
-      content: '',
+      type: "assistant",
+      content: "",
       timestamp: new Date(),
-      isLoading: true
+      isLoading: true,
     }
 
-    setMessages(prev => [...prev, userMessage, loadingMessage])
-    setInputMessage('')
+    setMessages((prev) => [...prev, userMessage, loadingMessage])
+    setInputMessage("")
     setIsLoading(true)
     setError(null)
 
     try {
       // Get user data from localStorage
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}')
-      const farmFields = JSON.parse(localStorage.getItem('farmFields') || '[]')
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}")
+      const farmFields = JSON.parse(localStorage.getItem("farmFields") || "[]")
 
       // Validate user data for debugging
       if (!userData.userId) {
-        console.warn('[Chat] No userId found in localStorage. User may need to complete onboarding.')
+        console.warn("[Chat] No userId found in localStorage. User may need to complete onboarding.")
       }
 
       // Prepare context for AI
       const context = {
-        selectedField: selectedPolygon ? {
-          id: selectedPolygon.id, // Add the polygon ID!
-          name: selectedPolygon.name,
-          area: selectedPolygon.area,
-          center: selectedPolygon.center
-        } : null,
+        selectedField: selectedPolygon
+          ? {
+              id: selectedPolygon.id, // Add the polygon ID!
+              name: selectedPolygon.name,
+              area: selectedPolygon.area,
+              center: selectedPolygon.center,
+            }
+          : null,
         userLocation: userLocation,
         userData: {
           ...userData,
           cropName: userData.farmerProfile?.cropName,
           soilType: userData.farmerProfile?.soilType,
           irrigationMethod: userData.farmerProfile?.irrigationMethod,
-          farmSize: farmFields.reduce((sum: number, field: any) => sum + (field.area || 0), 0)
+          farmSize: farmFields.reduce((sum: number, field: any) => sum + (field.area || 0), 0),
         },
         farmFields,
-        totalFields: existingPolygons.length
+        totalFields: existingPolygons.length,
       }
 
       const requestBody = {
@@ -227,21 +251,24 @@ What would you like to know about your farming operations?`,
         userId: userData.userId || null, // Ensure we send null if no userId
         context,
         history: messages
-          .filter(m => !m.isLoading && m.id !== 'welcome' && (m.type === 'user' || m.type === 'assistant'))
-          .map(m => ({
+          .filter((m) => !m.isLoading && m.id !== "welcome" && (m.type === "user" || m.type === "assistant"))
+          .map((m) => ({
             role: m.type,
-            content: m.content
+            content: m.content,
           }))
-          .slice(-10) // Limit to last 10 messages for context window
+          .slice(-10), // Limit to last 10 messages for context window
       }
 
       // Log request summary (not full body for security)
-      console.log('[Chat] Sending AI request:', { hasUserId: !!requestBody.userId, messageLength: requestBody.message.length })
+      console.log("[Chat] Sending AI request:", {
+        hasUserId: !!requestBody.userId,
+        messageLength: requestBody.message.length,
+      })
 
-      const response = await fetch('/api/ai-chat', {
-        method: 'POST',
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       })
@@ -254,41 +281,41 @@ What would you like to know about your farming operations?`,
 
       const assistantMessage: Message = {
         id: (Date.now() + 2).toString(),
-        type: 'assistant',
-        content: data.response || 'I apologize, but I was unable to process your request at this time.',
+        type: "assistant",
+        content: data.response || "I apologize, but I was unable to process your request at this time.",
         timestamp: new Date(),
         insights: {
           answer: data.response,
           recommendations: data.recommendations || [],
           urgentAlerts: data.urgentAlerts || [],
           confidence: data.confidence || 0.8,
-          sources: data.sources || ['AI Analysis'],
-          dataUsed: data.dataUsed
-        }
+          sources: data.sources || ["AI Analysis"],
+          dataUsed: data.dataUsed,
+        },
       }
 
-      setMessages(prev => prev.slice(0, -1).concat([assistantMessage]))
+      setMessages((prev) => prev.slice(0, -1).concat([assistantMessage]))
     } catch (error: any) {
-      console.error('Error sending message:', error)
+      console.error("Error sending message:", error)
 
-      let errorContent = 'I apologize, but I encountered an error while processing your request. '
+      let errorContent = "I apologize, but I encountered an error while processing your request. "
 
-      if (error.message?.includes('400')) {
-        errorContent += 'Please try rephrasing your question or ask about general farming topics.'
-      } else if (error.message?.includes('500')) {
-        errorContent += 'The AI service is temporarily unavailable. Please try again in a moment.'
+      if (error.message?.includes("400")) {
+        errorContent += "Please try rephrasing your question or ask about general farming topics."
+      } else if (error.message?.includes("500")) {
+        errorContent += "The AI service is temporarily unavailable. Please try again in a moment."
       } else {
-        errorContent += 'Please try again or ask a different question.'
+        errorContent += "Please try again or ask a different question."
       }
 
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        type: 'assistant',
+        type: "assistant",
         content: errorContent,
-        timestamp: new Date()
+        timestamp: new Date(),
       }
-      setMessages(prev => prev.slice(0, -1).concat([errorMessage]))
-      setError('Failed to get AI response. Please try again.')
+      setMessages((prev) => prev.slice(0, -1).concat([errorMessage]))
+      setError("Failed to get AI response. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -299,7 +326,7 @@ What would you like to know about your farming operations?`,
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage(inputMessage)
     }
@@ -323,7 +350,7 @@ What would you like to know about your farming operations?`,
             AI Assistant
             {messages.length > 0 && (
               <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 text-xs">
-                {messages.filter(m => m.type === 'user').length}
+                {messages.filter((m) => m.type === "user").length}
               </Badge>
             )}
           </TabsTrigger>
@@ -337,9 +364,7 @@ What would you like to know about your farming operations?`,
                 <MapPin className="w-5 h-5" />
                 Field Management
               </CardTitle>
-              <CardDescription>
-                Create and manage your farm fields using satellite imagery
-              </CardDescription>
+              <CardDescription>Create and manage your farm fields using satellite imagery</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 p-6">
               <div className="h-96 w-full">
@@ -378,9 +403,7 @@ What would you like to know about your farming operations?`,
                   <CardDescription>
                     Get personalized farming insights and recommendations
                     {selectedPolygon && (
-                      <span className="block mt-1 text-primary font-medium">
-                        Active Field: {selectedPolygon.name}
-                      </span>
+                      <span className="block mt-1 text-primary font-medium">Active Field: {selectedPolygon.name}</span>
                     )}
                   </CardDescription>
                 </CardHeader>
@@ -392,10 +415,11 @@ What would you like to know about your farming operations?`,
                       {messages.map((message) => (
                         <div
                           key={message.id}
-                          className={`flex items-start gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'
-                            }`}
+                          className={`flex items-start gap-3 ${
+                            message.type === "user" ? "justify-end" : "justify-start"
+                          }`}
                         >
-                          {message.type === 'assistant' && (
+                          {message.type === "assistant" && (
                             <Avatar className="w-8 h-8 bg-primary">
                               <AvatarFallback>
                                 <Bot className="w-4 h-4 text-primary-foreground" />
@@ -404,10 +428,9 @@ What would you like to know about your farming operations?`,
                           )}
 
                           <div
-                            className={`max-w-[80%] p-3 rounded-lg ${message.type === 'user'
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                              }`}
+                            className={`max-w-[80%] p-3 rounded-lg ${
+                              message.type === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                            }`}
                           >
                             {message.isLoading ? (
                               <div className="flex items-center gap-2">
@@ -450,7 +473,7 @@ What would you like to know about your farming operations?`,
                                     <div className="space-y-1">
                                       {message.insights.sources.length > 0 && (
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                          <span>Sources: {message.insights.sources.join(', ')}</span>
+                                          <span>Sources: {message.insights.sources.join(", ")}</span>
                                         </div>
                                       )}
 
@@ -478,11 +501,12 @@ What would you like to know about your farming operations?`,
                                             </Badge>
                                           )}
                                           {/* Debug info for troubleshooting */}
-                                          {message.insights.dataUsed.debugInfo && !message.insights.dataUsed.debugInfo.hadUserId && (
-                                            <Badge variant="destructive" className="h-5 text-xs px-1">
-                                              ⚠️ No User Profile
-                                            </Badge>
-                                          )}
+                                          {message.insights.dataUsed.debugInfo &&
+                                            !message.insights.dataUsed.debugInfo.hadUserId && (
+                                              <Badge variant="destructive" className="h-5 text-xs px-1">
+                                                ⚠️ No User Profile
+                                              </Badge>
+                                            )}
                                         </div>
                                       )}
                                     </div>
@@ -492,11 +516,11 @@ What would you like to know about your farming operations?`,
                             )}
 
                             <div className="text-xs text-muted-foreground mt-2" suppressHydrationWarning>
-                              {isClient ? message.timestamp.toLocaleTimeString() : '--:--:--'}
+                              {isClient ? message.timestamp.toLocaleTimeString() : "--:--:--"}
                             </div>
                           </div>
 
-                          {message.type === 'user' && (
+                          {message.type === "user" && (
                             <Avatar className="w-8 h-8 bg-secondary">
                               <AvatarFallback>
                                 <User className="w-4 h-4 text-secondary-foreground" />
@@ -533,7 +557,6 @@ What would you like to know about your farming operations?`,
                       >
                         <Send className="w-4 h-4" />
                       </Button>
-
                     </div>
                   </div>
                 </CardContent>
@@ -571,9 +594,7 @@ What would you like to know about your farming operations?`,
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Quick Questions</CardTitle>
-                  <CardDescription>
-                    Click on a question to get instant insights
-                  </CardDescription>
+                  <CardDescription>Click on a question to get instant insights</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
